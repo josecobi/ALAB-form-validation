@@ -18,11 +18,11 @@ function validateRegForm(evt){
     return false;
   }
 
-  // const validateEmail = validateEmail()
-  // if(validateEmail === false){
-  //   evt.preventDefault();
-  //   return false;
-  // }
+  const validateEmailAddress = validateEmail()
+  if(validateEmailAddress === false){
+    evt.preventDefault();
+    return false;
+  }
 
   return true;
 }
@@ -43,6 +43,7 @@ function validateUsername() {
     usernameField.focus();
     return false;
   }
+  
   
   let unique = [];
   chars.forEach((char) => {
@@ -77,3 +78,27 @@ function validateUsername() {
   return nameVal;
 }
 
+function validateEmail(){
+  let emailVal = emailField.value;
+  // Make a copy of the username to work with it without changing the original value
+  let emailCopy = emailVal.slice(0);
+  // Create an array of characters from the username to iterate through it and check requirements
+  const chars = emailCopy.split("");
+
+  let atPos = chars.indexOf("@");
+ 
+  let dotPos = chars.lastIndexOf(".");
+  console.log("atpos" + atPos + " " + chars[atPos]);
+  console.log("dotpos" + dotPos + " " + chars[dotPos]);
+  if(!chars.includes("@") || !chars.includes(".") || atPos < 1 || (dotPos - atPos) < 1 || chars.includes(" ")){
+    errorDisplay.innerHTML =
+      "<span>Please, enter a valid email.</span>";
+    errorDisplay.style.display = "block";
+    emailField.focus();
+    return false;
+  }
+
+  
+  errorDisplay.style.display = "none";
+  return emailVal;
+}
