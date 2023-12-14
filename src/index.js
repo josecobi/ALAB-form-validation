@@ -64,7 +64,7 @@ function validateUsername() {
     return false;
   }
   // Check if the username contains special characters. If so, display feedback and return false.
-  let specialChars =/[`!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?~ ]/;
+  let specialChars =/[`!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?~]/g;
   
   if(specialChars.test(nameVal) === true){
     errorDisplay.innerHTML =
@@ -80,17 +80,16 @@ function validateUsername() {
 
 function validateEmail(){
   let emailVal = emailField.value;
-  // Make a copy of the username to work with it without changing the original value
+  // Make a copy of the email value to work with it without changing the original value
   let emailCopy = emailVal.slice(0);
-  // Create an array of characters from the username to iterate through it and check requirements
+  // Create an array of characters from the email to iterate through it and check requirements
   const chars = emailCopy.split("");
 
+  //Get the index position of @ and . in the email address provided by the user
   let atPos = chars.indexOf("@");
- 
   let dotPos = chars.lastIndexOf(".");
-  console.log("atpos" + atPos + " " + chars[atPos]);
-  console.log("dotpos" + dotPos + " " + chars[dotPos]);
-  if(!chars.includes("@") || !chars.includes(".") || atPos < 1 || (dotPos - atPos) < 1 || chars.includes(" ")){
+
+  if(!chars.includes("@") || !chars.includes(".") || atPos < 1 || (dotPos - atPos) < 2 || chars.includes(" ")){
     errorDisplay.innerHTML =
       "<span>Please, enter a valid email.</span>";
     errorDisplay.style.display = "block";
@@ -98,7 +97,35 @@ function validateEmail(){
     return false;
   }
 
-  
+  // Create Regex variable and check if the email provided contains 'example.com'. If so display error message.
+  const re = /example\.com/;
+  if (emailVal.endsWith("example.com") || re.test(emailVal)) {
+    errorDisplay.innerHTML =
+      '<span>The email must not be from the domain "example.com".</span>';
+    errorDisplay.style.display = "block";
+    emailField.focus();
+    return false;
+  }
+
   errorDisplay.style.display = "none";
   return emailVal;
+}
+
+function validatePassword(){
+  let passwordVal = passwordField.value;
+
+  let passwordCopy = passwordVal.slice(0);
+  // Create an array of characters from the username to iterate through it and check requirements
+  const chars = passwordCopy.split("");
+
+  // Check for the lenght of the username provided by the user
+  if(chars.length < 12){
+    errorDisplay.innerHTML =
+      "<span>Password must be at least 12 characters long</span>";
+    errorDisplay.style.display = "block";
+    passwordField.focus();
+    return false;
+  }
+
+  
 }
