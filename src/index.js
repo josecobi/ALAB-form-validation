@@ -7,9 +7,22 @@ const passwordField = regForm.elements["password"];
 const passwordCheckField = regForm.elements["passwordCheck"];
 const errorDisplay = document.querySelector("#errorDisplay");
 const registerBtn = document.querySelector("#regBtn");
+const passwordError = document.querySelector(".passwordError");
 console.log(usernameField.value);
 
+//Variables for the password validation logic
+const re12charError = document.querySelector(".re12charError");     
+const reUpLowError = document.querySelector(".reUpLowError");     
+const reDigError = document.querySelector(".reDigError");    
+const reSpeCharError = document.querySelector(".reSpeCharError");    
+const rePassError = document.querySelector(".rePassError");    
+const UNameError = document.querySelector(".UNameError");
+const repeatPassError = document.querySelector.apply(".repeatPassError");     
+
 regForm.addEventListener("submit", validateRegForm);
+// add event listener per https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event 
+passwordField.addEventListener("input", validatePassword);
+usernameField.addEventListener("input", validatePassword);
 
 function validateRegForm(evt){
   const validateName = validateUsername()
@@ -23,7 +36,7 @@ function validateRegForm(evt){
     evt.preventDefault();
     return false;
   }
-
+  validatePassword()
   return true;
 }
 
@@ -112,20 +125,43 @@ function validateEmail(){
 }
 
 function validatePassword(){
-  let passwordVal = passwordField.value;
 
-  let passwordCopy = passwordVal.slice(0);
-  // Create an array of characters from the username to iterate through it and check requirements
-  const chars = passwordCopy.split("");
+      // Show the password error
+      passwordError.classList.remove('hide');
+      // create variables and store regular  expressions in them then check condition for each one
+      // hide the errors as the password meets each requirement. Easier for the user to keep track of the missing requirements
+      // match any character and make sure there are at leat 12 chars
+      let re12CharMin = /.{12,}$/gm;
+      if (re12CharMin.test(passwordField.value)){
+        re12charError.classList.add('hide');
+      }
+      // at least 1 upper and 1 lower letter. "^" is the beginning of the string "?=..." Lookahead assertation. 
+      let reUpLowCase = /^(?=.*[a-z])(?=.*[A-Z])/gm;
+      if (reUpLowCase.test(passwordField.value)){
+        reUpLowError.classList.add('hide');
+      }
+      // at least one digit
+      let reDigit = /(?=.*\d)/gm;
+      if (reDigit.test(passwordField.value)){
+        reDigError.classList.add('hide');
+      }
+      // at least one special char
+      let reSpecialChar = /(?=.*[@#&*()_.'\^$%#\-\+=[\]{};':"\\|,.<>\/?~])/gm;
+      if (reSpecialChar.test(passwordField.value)){
+        reSpeCharError.classList.add('hide');
+      }
+      // must not include the word 'password'
+      let reIncludesPass = /(?!.*password)/gm;
+      if (reIncludesPass.test(passwordField.value)){
+        rePassError.classList.add('hide');
+      }
 
-  // Check for the lenght of the username provided by the user
-  if(chars.length < 12){
-    errorDisplay.innerHTML =
-      "<span>Password must be at least 12 characters long</span>";
-    errorDisplay.style.display = "block";
-    passwordField.focus();
-    return false;
+      // check if the password includes the username
+      if (passwordField.value.includes(usernameField.value)) {
+        UNameError.classList.remove('hide');
+      } else {
+        UNameError.classList.add('hide');
+      }
   }
-
   
-}
+

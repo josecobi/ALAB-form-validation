@@ -118,3 +118,19 @@ a:hover {
   padding: 20px;
   display: none;
 }
+
+.redText {
+  color: red;
+}
+
+.greenText {
+  color: green;
+}
+
+.hide {
+  display: none;
+}
+
+.passwordError{
+  font-size: x-small;
+}
