@@ -17,12 +17,12 @@ const reDigError = document.querySelector(".reDigError");
 const reSpeCharError = document.querySelector(".reSpeCharError");    
 const rePassError = document.querySelector(".rePassError");    
 const UNameError = document.querySelector(".UNameError");
-const repeatPassError = document.querySelector.apply(".repeatPassError");     
+const repeatPassError = document.querySelector(".repeatPassError");     
 
 regForm.addEventListener("submit", validateRegForm);
 // add event listener per https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event 
 passwordField.addEventListener("input", validatePassword);
-usernameField.addEventListener("input", validatePassword);
+
 
 function validateRegForm(evt){
   const validateName = validateUsername()
@@ -125,7 +125,7 @@ function validateEmail(){
 }
 
 function validatePassword(){
-
+    usernameField.addEventListener("input", validatePassword);
       // Show the password error
       passwordError.classList.remove('hide');
       // create variables and store regular  expressions in them then check condition for each one
