@@ -8,7 +8,7 @@ const passwordCheckField = regForm.elements["passwordCheck"];
 const errorDisplay = document.querySelector("#errorDisplay");
 const registerBtn = document.querySelector("#regBtn");
 const passwordError = document.querySelector(".passwordError");
-console.log(usernameField.value);
+
 
 //Variables for the password validation logic
 const re12charError = document.querySelector(".re12charError");     
@@ -19,25 +19,46 @@ const rePassError = document.querySelector(".rePassError");
 const UNameError = document.querySelector(".UNameError");
 const repeatPassError = document.querySelector(".repeatPassError");     
 
+// Regex veriables for password validation
+const re12CharMin = /.{12,}/gm;
+const reUpLowCase = /^(?=.*[a-z])(?=.*[A-Z])/gm;
+const reDigit = /(?=.*\d)/gm;
+const reSpecialChar = /(?=.*[@#&*()_.'\^$%#\-\+=[\]{};':"\\|,.<>\/?~])/gm;
+const reIncludesPass = /(?!.*password)/gm;
+
+
+
+// Add event listener to validate and submit the form
 regForm.addEventListener("submit", validateRegForm);
 // add event listener per https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event 
+passwordField.addEventListener("input", displayPassRequirements);
 passwordField.addEventListener("input", validatePassword);
 
 
 function validateRegForm(evt){
-  const validateName = validateUsername()
+  const validateName = validateUsername();
   if(validateName === false){
     evt.preventDefault();
     return false;
   }
 
-  const validateEmailAddress = validateEmail()
+  const validateEmailAddress = validateEmail();
   if(validateEmailAddress === false){
     evt.preventDefault();
     return false;
   }
-  validatePassword()
-  return true;
+
+  const validatePass = validatePassword();
+  if(validatePass === false){
+    evt.preventDefault();
+    return false;
+  }
+
+  const validatePassCheck =  validatePasswordCheck();
+  if(validatePassCheck === false){
+    evt.preventDefault();
+    return false;
+  }
 }
 
 function validateUsername() {
@@ -124,36 +145,48 @@ function validateEmail(){
   return emailVal;
 }
 
-function validatePassword(){
-    usernameField.addEventListener("input", validatePassword);
+function displayPassRequirements(){
+    usernameField.addEventListener("change", validatePassword);
       // Show the password error
       passwordError.classList.remove('hide');
       // create variables and store regular  expressions in them then check condition for each one
       // hide the errors as the password meets each requirement. Easier for the user to keep track of the missing requirements
       // match any character and make sure there are at leat 12 chars
-      let re12CharMin = /.{12,}$/gm;
+      
+
+
+
+
       if (re12CharMin.test(passwordField.value)){
         re12charError.classList.add('hide');
       }
       // at least 1 upper and 1 lower letter. "^" is the beginning of the string "?=..." Lookahead assertation. 
-      let reUpLowCase = /^(?=.*[a-z])(?=.*[A-Z])/gm;
       if (reUpLowCase.test(passwordField.value)){
         reUpLowError.classList.add('hide');
       }
+      else {
+        reUpLowError.classList.remove('hide');
+      }
       // at least one digit
-      let reDigit = /(?=.*\d)/gm;
       if (reDigit.test(passwordField.value)){
         reDigError.classList.add('hide');
       }
+      else {
+        reDigError.classList.remove('hide');
+      }
       // at least one special char
-      let reSpecialChar = /(?=.*[@#&*()_.'\^$%#\-\+=[\]{};':"\\|,.<>\/?~])/gm;
       if (reSpecialChar.test(passwordField.value)){
         reSpeCharError.classList.add('hide');
       }
+      else {
+        reSpeCharError.classList.remove('hide');
+      }
       // must not include the word 'password'
-      let reIncludesPass = /(?!.*password)/gm;
       if (reIncludesPass.test(passwordField.value)){
         rePassError.classList.add('hide');
+      }
+      else {
+        rePassError.classList.remove('hide');
       }
 
       // check if the password includes the username
@@ -162,6 +195,38 @@ function validatePassword(){
       } else {
         UNameError.classList.add('hide');
       }
+
+      validatePassword()
+  }
+  function validatePassword(){
+    if (re12CharMin.test(passwordField.value) &&
+        reUpLowCase.test(passwordField.value) &&
+        reDigit.test(passwordField.value) &&
+        reSpecialChar.test(passwordField.value) &&
+        reIncludesPass.test(passwordField.value)
+      ) {
+        // Password meets all requirements
+        passwordError.classList.add('hide');
+        return true;
+      }
+   else {
+      // Password does not have at least 12 characters
+      re12charError.classList.remove('hide');
+    }
+    
+    // If any of the conditions fail, focus on the password field and return false
+    passwordField.focus();
+    return false;
   }
   
-
+function validatePasswordCheck(){
+  console.log("check")
+  if(passwordCheckField.value !== passwordField.value){
+    
+    errorDisplay.innerHTML =
+      "<span>Both passwords must match.</span>";
+    errorDisplay.style.display = "block";
+    passwordCheckField.focus();
+    return false;
+  }
+}
