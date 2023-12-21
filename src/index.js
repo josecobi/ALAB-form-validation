@@ -1,4 +1,4 @@
-// Select elements by name and create variables
+// Select elements and create variables for the registration form
 const regForm = document.querySelector("#registration");
 const usernameField = regForm.elements["username"];
 const emailField = regForm.elements["email"];
@@ -6,8 +6,12 @@ const passwordField = regForm.elements["password"];
 const passwordCheckField = regForm.elements["passwordCheck"];
 const errorDisplay = document.querySelector("#errorDisplay");
 const registerBtn = document.querySelector("#regBtn");
-const passwordError = document.querySelector(".passwordError");
 const checkboxTerms = document.querySelector(".checkboxTerms");
+
+// Select elements and create variables for the login form
+const loginForm = document.querySelector("#login");
+const usernameFieldLogin = loginForm.elements["username"];
+const passwordFieldLogin = loginForm.elements["password"];
 
 // Add event listener to validate and submit the form
 regForm.addEventListener("submit", validateRegForm);
@@ -25,6 +29,7 @@ function displayErrorMessage(messages) {
 }
 
 function validateRegForm(evt) {
+  console.log("pwd: ", passwordField.value, "chckpwd: ", passwordCheckField.value);
   const validateName = validateUsername();
   if (validateName === false) {
     evt.preventDefault();
@@ -41,7 +46,7 @@ function validateRegForm(evt) {
   if(validatePass === false){
     evt.preventDefault();
     return false;
-    }
+  }
 
   const validatePassCheck = validatePasswordCheck();
   if (validatePassCheck === false) {
@@ -54,39 +59,30 @@ function validateRegForm(evt) {
     evt.preventDefault();
     return false;
   }
-
+ 
   if (validateName && validateEmailAddress && validatePass && validatePassCheck && isCheckboxChecked) {
     // if all validations pass, store the user data in localStorage
-    const storeUserData = storeUserData();
-    if (storeUserData === false) {
-      evt.preventDefault();
-      return false;
+    // check if the user provided already exists
+    if(storeUserData()){
+        // clear form fields
+        clearFormFields();
     }
-
-    // clear form fields
-    clearFormFields();
-
-    // show success message 
-    alert("Registration successful!");
 
     //prevent form submission
     evt.preventDefault();
-  } 
-  else {
+  } else {
     // Prevent the form submission if validation fails
     evt.preventDefault();
+    return false;
   }
 }
 
 function storeUserData() {
   // Retrieve existing user data from localStorage
- if(JSON.parse(localStorage.getItem("userData")) === null){
-  const existingUserData = [];
- }
- else {
-  const existingUserData = JSON.parse(localStorage.getItem("userData"));
- }
-
+  let usenarmeTaken = false;
+  let emailTaken = false;
+  const existingUserData = JSON.parse(localStorage.getItem("userData")) || [];
+  console.log(existingUserData);
   // Create a new user object
   const newUser = {
     username: usernameField.value.toLowerCase(),
@@ -95,29 +91,34 @@ function storeUserData() {
   };
 
   // Add the new user to the existing user data
-  existingUserData.forEach((user) => {
-    console.log(user);
-    if(newUser.username === user.username){
-    let usernameTaken = ["Sorry, this username already exists"]
-    displayErrorMessage(usernameTaken);
-    usernameField.focus();
-    return false;
-    }
-    else if(newUser.email === user.email){
-      let usernameTaken = ["Sorry, there is already an account with this email"]
-      displayErrorMessage(usernameTaken);
+  for(let existingUser of existingUserData){
+    if (existingUser.username === newUser.username){
+      let errorUsernameTaken = ["Username already exists."];
+      displayErrorMessage(errorUsernameTaken);
       usernameField.focus();
-      return false;
+      usenarmeTaken = true;
     }
-    else {
-      existingUserData.push(newUser);
-      // Store the updated user data back in localStorage
-      localStorage.setItem("userData", JSON.stringify(existingUserData));
-      return true;
+    else if (existingUser.email === newUser.email){
+      let errorEmailTaken = ["Email already in use."];
+      displayErrorMessage(errorEmailTaken);
+      emailField.focus();
+      emailTaken = true;
     }
+  }
+  if(usenarmeTaken === false && emailTaken === false){
+    existingUserData.push(newUser);
 
-  })
- 
+  // Store the updated user data back in localStorage
+  localStorage.setItem("userData", JSON.stringify(existingUserData));
+  console.log("New user stored");
+   // show success message 
+   alert("Registration successful!");
+  
+  return true;
+  }
+  else{
+    return false;
+  }
 }
 
 function clearFormFields() {
@@ -139,9 +140,9 @@ function validateUsername() {
   const chars = nameCopy.split("");
 
   // Check for the length of the username provided by the user
-  if (chars.length < 4) {
-    let charErrMessage = ["The username must be at least four characters long"];
-    displayErrorMessage(charErrMessage);
+  if (nameVal === "") {
+    let nameErrMessage = ["The username must be at least four characters long"];
+    displayErrorMessage(nameErrMessage);
     usernameField.focus();
     return false;
   }
@@ -212,7 +213,6 @@ function validatePassword() {
   let rePass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#&*()_.'^$%#\-\+=[\]{};':"\\|,.<>\/?~])(?!.*password).{12,}$/gm;
   if (rePass.test(passwordField.value)) {
     // Password meets all requirements
-    passwordError.classList.add("hide");
     return true;
   }
 
@@ -224,16 +224,25 @@ function validatePassword() {
 }
 
 function validatePasswordCheck() {
-  if (passwordCheckField.value !== passwordField.value) {
+  
+  if (passwordCheckField.value === passwordField.value) {
+    console.log("pwd: ", passwordField.value, "chckpwd: ", passwordCheckField.value);
+    return true;
+  }
+  else {
     let passCheckErrMessage = ["Both passwords must match."];
     displayErrorMessage(passCheckErrMessage);
     passwordCheckField.focus();
     return false;
   }
-  
-  return true;
 }
 
 function validateCheckbox() {
-  return checkboxTerms.checked;
+  if (checkboxTerms.checked){
+    return true;
+  }
+  else {
+    checkboxTerms.focus();
+    return false;
+  }
 }
