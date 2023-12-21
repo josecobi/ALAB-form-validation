@@ -13,9 +13,9 @@ const existingUserData = JSON.parse(localStorage.getItem("userData")) || [];
 
 // Add event listener to validate and submit the form
 regForm.addEventListener("submit", validateRegForm);
-
+// declare function to display errors
 function displayErrorMessage(messages) {
- 
+  // Modify the inner HTML to display a list of messages
   let errorMessageHTML = '<ul>';
   messages.forEach(message => {
     errorMessageHTML += `<li>${message}</li>`;
@@ -144,7 +144,7 @@ function validateUsername() {
     usernameField.focus();
     return false;
   }
-
+  //Create an empty array to store the unique chars from the username provided
   let unique = [];
   chars.forEach((char) => {
     // If the character is not in unique, append it to it
@@ -176,6 +176,7 @@ function validateUsername() {
   return nameVal;
 }
 
+// Declare a function to validate email
 function validateEmail() {
   let emailVal = emailField.value;
   // Make a copy of the email value to work with it without changing the original value
@@ -186,7 +187,7 @@ function validateEmail() {
   // Get the index position of @ and . in the email address provided by the user
   let atPos = chars.indexOf("@");
   let dotPos = chars.lastIndexOf(".");
-
+  //Check if they are in the right position in the email address
   if (!chars.includes("@") || !chars.includes(".") || atPos < 1 || (dotPos - atPos) < 2 || chars.includes(" ")) {
     let emailErrmessage = ["Please, enter a valid email."]
     displayErrorMessage(emailErrmessage);
@@ -202,11 +203,12 @@ function validateEmail() {
     emailField.focus();
     return false;
   }
-
+  // hide the error message
   errorDisplay.style.display = "none";
   return emailVal;
 }
 
+// Declare a function to validate the password
 function validatePassword() {
   let rePass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#&*()_.'^$%#\-\+=[\]{};':"\\|,.<>\/?~])(?!.*password).{12,}$/gm;
   if (rePass.test(passwordField.value)) {
@@ -221,8 +223,8 @@ function validatePassword() {
   return false;
 }
 
+// Declare a function to check if both passwords match
 function validatePasswordCheck() {
-  
   if (passwordCheckField.value === passwordField.value) {
     console.log("pwd: ", passwordField.value, "chckpwd: ", passwordCheckField.value);
     return true;
@@ -235,6 +237,7 @@ function validatePasswordCheck() {
   }
 }
 
+// Declare a function to make sure the user checked the box for the terms
 function validateCheckbox() {
   if (checkboxTerms.checked){
     return true;
@@ -257,10 +260,7 @@ const checkBoxKeepLogged = loginForm.elements["persist"];
 loginForm.addEventListener("submit", login);
 
 // Declare function to validate username
-
 function login(evt) {
-
-
 
     let namePassMatch = false;
 
@@ -269,6 +269,7 @@ function login(evt) {
       return false;
     }
 
+    // Check the userrname and password match
     for(let user of existingUserData){
         if(user.username ===  usernameFieldLogin.value.toLowerCase() && user.password === passwordFieldLogin.value){
             namePassMatch = true;
@@ -287,6 +288,7 @@ function login(evt) {
           return true;
         }
     }
+    // if username and password don't match diplsay error 
     else {
         evt.preventDefault();
         let loginErrMessage = ["Invalid username or password. Please try again."]
@@ -295,8 +297,11 @@ function login(evt) {
     }
 }
 
+
+// Check the username is not blank
 function nameNotBlankLogin(){
   const nameValLogin = usernameFieldLogin.value;
+  //if blank display error and return false
     if (nameValLogin === "") {
         let nameErrMessage = ["The username cannot be blank"];
         displayErrorMessage(nameErrMessage);
@@ -307,8 +312,12 @@ function nameNotBlankLogin(){
         return true;
     }
 }
+
+
+// Check the password is not blank
 function passNotBlankLogin(){
   const passValLogin = passwordFieldLogin.value;
+  //if blank display error and return false
     if (passValLogin === "") {
         let passErrMessage = ["The password cannot be blank"];
         displayErrorMessage(passErrMessage);
