@@ -1,3 +1,4 @@
+//>>>>>>>>>>>>>>LOGIC FOR THE REGISTRATION FORM
 // Select elements and create variables for the registration form
 const regForm = document.querySelector("#registration");
 const usernameField = regForm.elements["username"];
@@ -7,11 +8,8 @@ const passwordCheckField = regForm.elements["passwordCheck"];
 const errorDisplay = document.querySelector("#errorDisplay");
 const registerBtn = document.querySelector("#regBtn");
 const checkboxTerms = document.querySelector(".checkboxTerms");
+const existingUserData = JSON.parse(localStorage.getItem("userData")) || [];
 
-// Select elements and create variables for the login form
-const loginForm = document.querySelector("#login");
-const usernameFieldLogin = loginForm.elements["username"];
-const passwordFieldLogin = loginForm.elements["password"];
 
 // Add event listener to validate and submit the form
 regForm.addEventListener("submit", validateRegForm);
@@ -81,7 +79,7 @@ function storeUserData() {
   // Retrieve existing user data from localStorage
   let usenarmeTaken = false;
   let emailTaken = false;
-  const existingUserData = JSON.parse(localStorage.getItem("userData")) || [];
+  
   console.log(existingUserData);
   // Create a new user object
   const newUser = {
@@ -245,4 +243,79 @@ function validateCheckbox() {
     checkboxTerms.focus();
     return false;
   }
+}
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>LOGIC FOR THE LOGIN FORM<<<<<<<<<<<<<<<<<<
+// Select elements and create variables for the login form
+const loginForm = document.querySelector("#login");
+const usernameFieldLogin = loginForm.elements["username"];
+const passwordFieldLogin = loginForm.elements["password"];
+const checkBoxKeepLogged = loginForm.elements["persist"];
+
+
+loginForm.addEventListener("submit", login);
+
+// Declare function to validate username
+
+function login(evt) {
+
+
+
+    let namePassMatch = false;
+
+    if(!nameNotBlankLogin() || !passNotBlankLogin()){
+      evt.preventDefault();
+      return false;
+    }
+
+    for(let user of existingUserData){
+        if(user.username ===  usernameFieldLogin.value.toLowerCase() && user.password === passwordFieldLogin.value){
+            namePassMatch = true;
+        }
+        else {
+            namePassMatch = false;
+        }
+    }
+    if(namePassMatch){
+        if(checkBoxKeepLogged.checked){
+          alert("Login successful! You will be kept logged in.");
+          return true;
+        }
+        else{
+          alert("Login successful!");
+          return true;
+        }
+    }
+    else {
+        evt.preventDefault();
+        let loginErrMessage = ["Invalid username or password. Please try again."]
+        displayErrorMessage(loginErrMessage);
+        return false;
+    }
+}
+
+function nameNotBlankLogin(){
+  const nameValLogin = usernameFieldLogin.value;
+    if (nameValLogin === "") {
+        let nameErrMessage = ["The username cannot be blank"];
+        displayErrorMessage(nameErrMessage);
+        usernameFieldLogin.focus();
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+function passNotBlankLogin(){
+  const passValLogin = passwordFieldLogin.value;
+    if (passValLogin === "") {
+        let passErrMessage = ["The password cannot be blank"];
+        displayErrorMessage(passErrMessage);
+        passwordFieldLogin.focus();
+        return false;
+    }
+    else{
+        return true;
+    }
 }
